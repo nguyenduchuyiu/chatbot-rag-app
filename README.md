@@ -1,6 +1,6 @@
-# Elastic Chatbot RAG App
+# Mini Perplexity
 
-This is a sample app that combines Elasticsearch, Langchain and a number of different LLMs to create a chatbot experience with ELSER with your own private data.
+This is a sample app that combines Elasticsearch, Langchain and a number of different LLMs to create a real-time search, chatbot experience with ELSER.
 
 **Requires at least 8.11.0 of Elasticsearch.**
 
@@ -8,18 +8,9 @@ This is a sample app that combines Elasticsearch, Langchain and a number of diff
 
 ## Download the Project
 
-Download the project from Github and extract the `chatbot-rag-app` folder.
+Download the project from Github and extract the `mini-perplexity` folder.
 
-```bash
-curl https://codeload.github.com/elastic/elasticsearch-labs/tar.gz/main | \
-tar -xz --strip=2 elasticsearch-labs-main/example-apps/chatbot-rag-app
-```
-
-## Installing and connecting to Elasticsearch
-
-### Install Elasticsearch
-
-There are a number of ways to install Elasticsearch. Cloud is best for most use-cases. Visit the [Install Elasticsearch](https://www.elastic.co/search-labs/tutorials/install-elasticsearch) for more information.
+## Connecting to Elasticsearch
 
 ### Connect to Elasticsearch
 
@@ -67,8 +58,6 @@ To use OpenAI LLM, you will need to provide the OpenAI key via `OPENAI_API_KEY` 
 export LLM_TYPE=openai
 export OPENAI_API_KEY=...
 ```
-
-You can get your OpenAI key from the [OpenAI dashboard](https://platform.openai.com/account/api-keys).
 
 ### Azure OpenAI
 
@@ -140,35 +129,13 @@ export COHERE_MODEL=...  # optional
 
 ## Running the App
 
-Once you have indexed data into the Elasticsearch index, there are two ways to run the app: via Docker or locally. Docker is advised for testing & production use. Locally is advised for development.
-
-### Through Docker
-
-Build the Docker image and run it with the following environment variables.
-
-```sh
-docker build -f Dockerfile -t chatbot-rag-app .
-```
-
-#### Ingest data
-
-Make sure you have a `.env` file with all your variables, then run:
-
-```sh
-docker run --rm --env-file .env chatbot-rag-app flask create-index
-```
-
-See "Ingest data" section under Running Locally for more details about the `flask create-index` command.
-
 #### Run API and frontend
 
-You will need to set the appropriate environment variables in your `.env` file. See the `env.example` file for instructions.
+You will need to set the appropriate environment variables in your `.env` file.
 
 ```sh
-docker run --rm -p 4000:4000 --env-file .env -d chatbot-rag-app
+docker run --rm -p 4000:4000 --env-file .env mini-perplexity
 ```
-
-Note that if you are using an LLM that requires an external credentials file (such as Vertex AI), you will need to make this file accessible to the container in the `run` command above. For this you can use a bind mount, or you can also edit the Dockerfile to copy the credentials file to the container image at build time.
 
 ### Locally (for development)
 
@@ -182,9 +149,6 @@ With the environment variables set, you can run the following commands to start 
 #### Install the dependencies
 
 For Python we recommend using a virtual environment.
-
-_ℹ️ Here's a good [primer](https://realpython.com/python-virtual-environments-a-primer) on virtual environments from Real Python._
-
 ```sh
 # Create a virtual environment
 python -m venv .venv
@@ -198,24 +162,6 @@ pip install -r requirements.txt
 # Install Node dependencies
 cd frontend && yarn && cd ..
 ```
-
-#### Ingest data
-
-You can index the sample data from the provided .json files in the `data` folder:
-
-```sh
-flask create-index
-```
-
-By default, this will index the data into the `workplace-app-docs` index. You can change this by setting the `ES_INDEX` environment variable.
-
-##### Indexing your own data
-
-The ingesting logic is stored in `data/index-data.py`. This is a simple script that uses Langchain to index data into Elasticsearch, using the `JSONLoader` and `CharacterTextSplitter` to split the large documents into passages. Modify this script to index your own data.
-
-Langchain offers many different ways to index data, if you cant just load it via JSONLoader. See the [Langchain documentation](https://python.langchain.com/docs/modules/data_connection/document_loaders)
-
-Remember to keep the `ES_INDEX` environment variable set to the index you want to index into and to query from.
 
 #### Run API and frontend
 
