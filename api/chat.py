@@ -36,10 +36,14 @@ store = ElasticsearchStore(
 def ask_question(question, session_id):
     yield f"data: {SESSION_ID_TAG} {session_id}\n\n"
     current_app.logger.debug("Chat session ID: %s", session_id)
-    
-    chat_history = get_elasticsearch_chat_message_history(
-        INDEX_CHAT_HISTORY, session_id
-    )
+    try:
+        chat_history = get_elasticsearch_chat_message_history(
+            INDEX_CHAT_HISTORY, session_id
+        )
+        print(f"Length of chat history: {len(chat_history.messages)}")
+    except Exception as e:
+        current_app.logger.error("Failed to get chat history: %s", e)
+        chat_history = []
     
 
     if len(chat_history.messages) > 0:
@@ -63,6 +67,7 @@ def ask_question(question, session_id):
     current_app.logger.debug("Question: %s", question)
 
     docs = store.as_retriever().invoke(condensed_question)
+    print(f"Length of docs: {len(docs)}")
     for doc in docs:
         doc_source = {**doc.metadata, "page_content": doc.page_content}
         current_app.logger.debug(
@@ -90,3 +95,4 @@ def ask_question(question, session_id):
 
     chat_history.add_user_message(question)
     chat_history.add_ai_message(answer)
+

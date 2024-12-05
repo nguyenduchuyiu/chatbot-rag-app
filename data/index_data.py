@@ -14,6 +14,9 @@ ELASTIC_CLOUD_ID = os.getenv("ELASTIC_CLOUD_ID")
 ELASTICSEARCH_URL = os.getenv("ELASTICSEARCH_URL")
 ELASTIC_API_KEY = os.getenv("ELASTIC_API_KEY")
 ELSER_MODEL = os.getenv("ELSER_MODEL", ".elser_model_2_linux-x86_64")
+INDEX_CHAT_HISTORY = os.getenv(
+    "ES_INDEX_CHAT_HISTORY", "workplace-app-docs-chat-history"
+)
 
 if ELASTICSEARCH_URL:
     elasticsearch_client = Elasticsearch(
@@ -56,7 +59,7 @@ def install_elser():
 def embed_data(path):
     print(f"Loading data from {path}")
 
-    metadata_keys = ["name", "summary", "url"]
+    metadata_keys = ["name", "summary", "url", "created_on"]
     workplace_docs = []
     with open(path, "rt") as f:
         for doc in json.loads(f.read()):
@@ -84,28 +87,22 @@ def embed_data(path):
     print(
         f"Creating Elasticsearch sparse vector store in Elastic Cloud: {ELASTIC_CLOUD_ID}"
     )
-
     # Create the Elasticsearch sparse vector store
-    max_retries = 3
-    retry_delay = 5  # seconds
-    
-    for attempt in range(max_retries):
-        try:
-            ElasticsearchStore.from_documents(
-                docs,
-                es_connection=elasticsearch_client,
-                index_name=INDEX,
-                strategy=ElasticsearchStore.SparseVectorRetrievalStrategy(model_id=ELSER_MODEL),
-                bulk_kwargs={
-                    "request_timeout": 60,
-                },
-            )
-            break  # Success - exit the retry loop
-        except Exception as e:
-            print(f"Attempt {attempt + 1}/{max_retries} failed: {e}")
-            if attempt < max_retries - 1:  # Don't sleep on the last attempt
-                print(f"Retrying in {retry_delay} seconds...")
-                time.sleep(retry_delay)
-            else:
-                print("Max retries reached. Operation failed.")
-                raise
+    elasticsearch_client.indices.delete(index=INDEX, ignore_unavailable=True)
+    # elasticsearch_client.indices.create(index=INDEX)
+
+    try:
+        ElasticsearchStore.from_documents(
+            docs,
+            es_connection=elasticsearch_client,
+            index_name=INDEX,
+            strategy=ElasticsearchStore.SparseVectorRetrievalStrategy(model_id=ELSER_MODEL),
+            bulk_kwargs={
+                "request_timeout": 120,
+            },
+        )
+    except Exception as e:
+        print(f"Operation failed: {e}")
+        raise
+
+# embed_data("data/data.json")
