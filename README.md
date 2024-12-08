@@ -1,3 +1,5 @@
+Slide: https://husteduvn-my.sharepoint.com/:p:/g/personal/hieu_vm206369_sis_hust_edu_vn/ERThO40M2mNNi7R8VfPMOmMBXSIT1jY-QxbaOaFzfm0rWA?e=aQoAFO
+
 # Mini Perplexity
 
 This is a sample app that combines Elasticsearch, Langchain and a number of different LLMs to create a real-time search, chatbot experience with ELSER.
