@@ -1,10 +1,8 @@
 # Mini Perplexity
 
 This is a sample app that combines Elasticsearch, Langchain and a number of different LLMs to create a real-time search, chatbot experience with ELSER.
-
-**Requires at least 8.11.0 of Elasticsearch.**
-Demo: https://youtu.be/Wm7fi5a67ng
-
+[Watch Demo](https://youtu.be/Wm7fi5a67ng)
+[View Slide](https://husteduvn-my.sharepoint.com/:p:/g/personal/hieu_vm206369_sis_hust_edu_vn/ERThO40M2mNNi7R8VfPMOmMBXSIT1jY-QxbaOaFzfm0rWA?e=lyhp5O)
 ## Download the Project
 
 Download the project from Github and extract the `mini-perplexity` folder.
